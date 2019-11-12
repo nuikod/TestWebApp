@@ -291,7 +291,7 @@
             var af_table;
             $.getJSON( "fire_table.json", function( json ) {
                 af_table = json;
-                console.log(af_table.functionality);
+                //console.log(af_table.functionality);
                 //console.log( "JSON Data received, name is " + json.functionality);
             });
 
@@ -398,34 +398,7 @@
                 var bMassed = document.getElementById("fire_massed_check").value;
                 var afdr = document.getElementById("af_dr").value;
 
-                alert("called");
-
-                var userdata = JSON.parse('{    "af_resolution": {        "N": [0, 8],        "DC": [9, 12],        "DA":[13, 14],        "DR":[15, 100]    }}');
-                console.log(userdata);
-
-                /*
-                fetch("./fire_table.json").then(response => response.json()).then(json => alert(json));
-                readTextFile("./fire_table.json", function (text) {
-                    var data = JSON.parse(text);
-                    alert(data);
-                });
-                */
-
-
-                /*
-                if ((npl_or + npl_dr) > (otr_or + otr_dr)) {
-                    document.getElementById("ini_res").innerText = "Napoleonic Player Initiative";
-                    document.getElementById("status_ini").innerText = "Initiative: Napoleonic Player";
-                }
-                else if ((npl_or + npl_dr) < (otr_or + otr_dr)) {
-                    document.getElementById("odr_result").innerText = "None-Napoleonic Player Initiative";
-                    document.getElementById("status_ini").innerText = "Initiative: None-Napoleonic Player";
-                }
-                else {
-                    document.getElementById("odr_result").innerText = "No Initiative Player";
-                    document.getElementById("status_ini").innerText = "Initiative: No Player";
-                }
-                */
+                console.log(af_table.table[N][1]);
             }
             function nextTurn() {
                 current_turn++;
