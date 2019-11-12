@@ -1,0 +1,11 @@
+{
+    "functionality": "af_resolution",
+    "table": [
+      {
+        "N": [0, 8],
+        "DC": [9, 12],
+        "DA": [13, 14],
+        "DR": [15, 100]
+      }
+    ]
+  }

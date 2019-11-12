@@ -1,0 +1,469 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>WEB - CSS</title>
+    <meta charset="utf-8">
+    <style>
+        .description {
+            font-size: 4;
+            color: slategrey
+        }
+
+        .status {
+            color: royalblue
+        }
+
+        .result {
+            color: orangered
+        }
+
+        a:hover {
+            color: aqua;
+        }
+
+        h1 {
+            font-size: 45px;
+            text-align: center;
+            border-bottom: 1px solid gray;
+            margin: 0;
+            padding: 20px
+        }
+
+        h3 {
+            font-size: 14px;
+
+        }
+
+        p,
+        div,
+        select,
+        option,
+        input,
+        button {
+            margin: 2px;
+            padding: 2px
+        }
+
+        #grid ol {
+            border-right: 1px solid gray;
+            width: 150px;
+            margin: 0;
+            margin-left: 20px;
+            padding: 5px;
+        }
+
+        #grid {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+        }
+
+        #grid #article {
+            padding: 2px;
+        }
+    </style>
+</head>
+
+<body onload="onLoad()">
+    <!--<a href="index.html">--------------</a>-->
+    <h1>Triumph & Glory</h1>
+
+    <h2>Sequence of Play</h2>
+    <h3>
+        <ol>
+            <li>
+                Orders
+                <ol>
+                    <li>Orders Delay DR</li>
+                    <li>Assign Orders</li>
+                </ol>
+            </li>
+            <li>
+                Initiative
+                <ol>
+                    <li>Initiative DR</li>
+                    <li>Select 1st AM for Initiative Player</li>
+                </ol>
+            </li>
+            <li>
+                Activation, until there's no AM in the Pool
+                <ol>
+                    <li>Select AM</li>
+                    <li><a onclick="showHelpCheckOrders()" href="#">Check Orders</a>
+                        <ol>
+                            <li> Artillery Fire </li>
+                            <li>Move Unit</li>
+                            <li>Shock / Cavarly Charge</li>
+                            <li>Rally</li>
+                        </ol>
+                    </li>
+                </ol>
+            </li>
+            <li>
+                Reserve
+                <ol>
+                    <li>Activate One Reserve Orders Command</li>
+                </ol>
+            </li>
+            <li>
+                Command Moral Phase
+                <ol>
+                    <li>Check Collapse</li>
+                    <li>Rout Movement for all Routed Units
+                    </li>
+                </ol>
+            </li>
+            <li>
+                Overall Commander Movement Phase
+            </li>
+        </ol>
+    </h3>
+    <h4 class="help">
+        <div id="help_doc">
+
+        </div>
+    </h4>
+    <h4 class="status">
+        Status of Current turn
+        <p id="status_current_turn"></p>
+        <p id="status_ini"></p>
+    </h4>
+    <div>
+        Side:
+        <select id="side_select">
+            <option>France, Napoleon</option>
+            <option>No Napoleon</option>
+        </select>
+    </div>
+
+    <div>
+        <div id="grid">
+            <select id="master_select" onchange="processSelected()">
+                <option value="ms_none">None</option>
+                <option value="ms_od">1.0 Orders Delay</option>
+                <option value="ms_od">2.0 Initiative Determination</option>
+                <option value="ms_od">3.0 Artillery Fire</option>
+                <option value="ms_od">4.0 Shock Commitment</option>
+                <option value="ms_od">5.0 Shock</option>
+            </select>
+        </div>
+        <div id="grid_od" style="display: none">
+            <div id="grid_od_dr" style="display: none">
+                <div>
+                    <p>Orders Delay Rating: <input id="odr_in" type="number" value="1" min="0" max="3">
+                        <div class="description">
+                            if (Dice Roll) > (Orders Dealy Rating) Failed for Orders New, Cumalative DRM for Next Orders
+                            Delay
+                            Roll, - No of Failed.
+                        </div>
+                    </p>
+                    <p>Dice Roll: <input id="odr_dr" type="number" value="5" min="0" max="9"><button
+                            onclick="evalOrdersDelay()">Evaluate!</button></p>
+                </div>
+                <p id="odr_result" class="result"></p>
+            </div>
+            <div id="grid_od_napoleon" style="display: none" class="result">
+                Napoleon do not roll for orders delay, Napoleon always can re-order every turn.
+            </div>
+        </div>
+        <div id="grid_initiative" style="display: none">
+            <p class="result">Refer scenario 1st. Both players roll dice and compare (DR + OR), if tied there's no
+                initiative
+                player.
+                <p>
+                    Napoleonic: Overall commander orders rating:
+                    <input id="ini_npl_in" type="number" value="3" min="0" max="5"> DR <input id="ini_npl_dr_in"
+                        type="number" value="5" min="0" max="9">
+                </p>
+                <p>
+                    Other: Overall commander orders rating:
+                    <input id="ini_otr_in" type="number" value="1" min="0" max="5"> DR <input id="ini_otr_dr_in"
+                        type="number" value="5" min="0" max="9">
+                </p>
+                <button onclick="evalInitiative()">Evaluate!</button>
+            </p>
+            <p id="ini_res"></p>
+            </p>
+        </div>
+        <div id="grid_fire" style="display: none">
+            <p>
+                <div class="description">Resolve all fire before unit movement.</div>
+                <div class="description">After fire, 1/2 MA cannot move to adjacent hex of enemy unit.</div>
+                <div class="description">For extended movement, cannot fire.</div>
+                <div class="description">Before fire, 1 vertex facing changeable, but after fire cannot move.</div>
+            </p>
+            <p>Fire Strength<input id="fire_str_in" type="number" value="3" min="0" max="6">
+            </p>
+            <p><input id="fire_stacked_check" type="checkbox">Stacked Artillery</p>
+            <p><input id="fire_massed_check" type="checkbox">Massed Target
+                <span class="description">(Square/2+Non-Artillery, Except Jaeger in Coalition at Austerlitz)</span>
+            </p>
+            <p>Fire Range
+                <select id="fire_range_select" onchange="processFireRange()">
+                    <option value="range0">Close</option>
+                    <option value="range1">In Effective Range</option>
+                    <option value="range2">Over Effective Range</option>
+                </select>
+            </p>
+            <p><input id="fire_barrage_check" type="checkbox">Artillery Barrage</p>
+            <p>Dice Roll: <input id="af_dr" type="number" value="5" min="0" max="9"></p>
+            <button onclick="evalFire()">Evaluate!</button>
+            </p>
+            <p id="ini_res"></p>
+            </p>
+        </div>
+        <div id="grid_shock_commit" style="display: none">
+            <p>Commitment DR<span>Disordered Unit cannot shock (including top unit is disordered).</span>
+                <p>
+                    <p><input id="grid_shock_commitment_check_charge" type="checkbox">Cavarly Charge</p>
+                    <p>For Top Unit in Stack:<span>Check Order & Range</span>
+                        <select id="shock_check_order_select" onchange="processFireRange()">
+                            <option value="range0">Under Orders & at least 1 unit in commander's range</option>
+                            <option value="range1">Under Orders</option>
+                            <option value="range2">No Orders</option>
+                        </select>
+                    </p>
+                    <!-- 아래는 기병돌격일 때는 적용하지 않는다.. -->
+                    <div id="shock_front_check_defender" style="display: none">
+                        <p><input id="shock_front_check" type="checkbox">To Defender Front</p>
+                        <div>
+                            <p>Defensive Fire DRM of Top Unit of Defender<input id="shock_dfdrm_in" type="number"
+                                    value="3" min="0" max="6">
+                        </div>
+                    </div>
+                    <button onclick="evalShockCommitment()">Evaluate!</button>
+                </p>
+                <p id="ini_res"></p>
+            </p>
+        </div>
+        <div id="grid_shock" style="display: none">
+            <p>Shock
+                <p>Strength Odds/Ratio:
+                    <select id="shock_check_order_select" onchange="processFireRange()">
+                        <option value="oddsM2">1-3</option>
+                        <option value="oddsM1">1-2</option>
+                        <option value="odds0">1-1</option>
+                        <option value="oddsP1">2-1</option>
+                        <option value="oddsP2">3-1</option>
+                    </select>
+                    <span class="description">Calc separately for Infantry/Calvalry for same unit, in order for
+                        attacker's
+                        choice</span>
+                </p>
+                <p>Cohesion Difference: <input id="odr_in" type="number" value="0" min="-10" max="10">
+                    <span class="description">Do not use Cohesion value of Artillery Unit</span>
+                </p>
+
+                <p>Defender Terrain Superiority:
+                    <select id="shock_check_terrain_select" onchange="processFireRange()">
+                        <option value="terrain0">Terrain 1</option>
+                        <option value="terrain0">Terrain 2</option>
+                        <option value="terrain0">Terrain 3</option>
+                        <option value="terrain0">Terrain 4</option>
+                    </select>
+                    <span class="description">If terrain of defender is superior than attacker for hex & hexside</span>
+                </p>
+                <p><input id="grid_shock_check_defender_routed" type="checkbox">Routed Defender</p>
+                <p><input id="grid_shock_check_position" type="checkbox">Attack to Rear</p>
+                <p style="display: none"><input id="grid_shock_check_position_advanced" type="checkbox">Attack to
+                    Rear &
+                    attacker's unit exist in defender's front</p>
+                <button onclick="evalShockCommitment()">Evaluate!</button>
+                <p id="ini_res"></p>
+            </p>
+        </div>
+        <div id="grid_next">
+            <button onclick="nextTurn()">To Next Turn</button>
+        </div>
+        <div>
+            <button id="show_help" onclick="onShowGeneralHelp()">Show General Help</button>
+            <div id="gen_help" style="display: none">
+                <ol>
+                    <li>Facing</li>
+                    <li>Stacking</li>
+                    <li>ZoC</li>
+                    <li>Reinforcements</li>
+                </ol>
+            </div>
+        </div>
+        <script src="jquery-3.4.1.min.js"></script>
+        <script>
+            $.getJSON( "fire_table.json", function( json ) {
+                console.log( "JSON Data received, name is " + json.name);
+            });
+
+            var odr_cumalative_drm = 0;
+            var current_turn = 1;
+            var range = 0;
+
+            function initializeGrid() {
+                document.getElementById("grid_od").style.display = 'None';
+                document.getElementById("grid_od_dr").style.display = 'None';
+                document.getElementById("grid_od_napoleon").style.display = 'None';
+
+                document.getElementById("grid_initiative").style.display = 'None';
+
+                document.getElementById("grid_fire").style.display = 'None';
+
+                document.getElementById("grid_shock_commit").style.display = 'None';
+
+                document.getElementById("grid_shock").style.display = 'None';
+            }
+
+            function processSelected() {
+                initializeGrid();
+                switch (document.getElementById("master_select").selectedIndex) {
+                    case 1:
+                        {
+                            if (document.getElementById("side_select").selectedIndex == 0) {
+                                document.getElementById("grid_od").style.display = '';
+                                document.getElementById("grid_od_napoleon").style.display = '';
+                                document.getElementById("grid_od_dr").style.display = 'None';
+                            }
+                            else {
+                                document.getElementById("grid_od").style.display = '';
+                                document.getElementById("grid_od_dr").style.display = '';
+                                document.getElementById("grid_od_napoleon").style.display = 'None';
+                            }
+                        }
+                        break;
+                    case 2:
+                        {
+                            document.getElementById("grid_initiative").style.display = '';
+                        }
+                        break;
+                    case 3:
+                        {
+                            document.getElementById("grid_fire").style.display = '';
+                        }
+                        break;
+                    case 4:
+                        {
+                            document.getElementById("grid_shock_commit").style.display = '';
+                        }
+                        break;
+                    case 5:
+                        {
+                            document.getElementById("grid_shock").style.display = '';
+                        }
+                        break;
+                    default:
+                        {
+                            initializeGrid();
+                        }
+                }
+            }
+            function processFireRange() {
+                range = document.getElementById("fire_range_select").selectedIndex;
+                //alert(range);
+            }
+            function evalOrdersDelay() {
+                var val_r = document.getElementById("odr_in").value;
+                var val_dr = document.getElementById("odr_dr").value;
+                if ((val_dr - odr_cumalative_drm) > val_r) {
+                    document.getElementById("odr_result").innerText = "Failed, Orders Delayed";
+                    odr_cumalative_drm += 1;
+                }
+                else {
+                    document.getElementById("odr_result").innerText = "Success, New Orders.";
+                    odr_cumalative_drm = 0;
+                }
+            }
+            function evalInitiative() {
+                var npl_or = document.getElementById("ini_npl_in").value;
+                var npl_dr = document.getElementById("ini_npl_dr_in").value;
+                var otr_or = document.getElementById("ini_otr_in").value;
+                var otr_dr = document.getElementById("ini_otr_dr_in").value;
+
+                if ((npl_or + npl_dr) > (otr_or + otr_dr)) {
+                    document.getElementById("ini_res").innerText = "Napoleonic Player Initiative";
+                    document.getElementById("status_ini").innerText = "Initiative: Napoleonic Player";
+                }
+                else if ((npl_or + npl_dr) < (otr_or + otr_dr)) {
+                    document.getElementById("odr_result").innerText = "None-Napoleonic Player Initiative";
+                    document.getElementById("status_ini").innerText = "Initiative: None-Napoleonic Player";
+                }
+                else {
+                    document.getElementById("odr_result").innerText = "No Initiative Player";
+                    document.getElementById("status_ini").innerText = "Initiative: No Player";
+                }
+            }
+            
+            function evalFire() {
+                var fStr = document.getElementById("fire_str_in").value;
+                var bStacked = document.getElementById("fire_stacked_check").value;
+                var bMassed = document.getElementById("fire_massed_check").value;
+                var afdr = document.getElementById("af_dr").value;
+
+                alert("called");
+
+                var userdata = JSON.parse('{    "af_resolution": {        "N": [0, 8],        "DC": [9, 12],        "DA":[13, 14],        "DR":[15, 100]    }}');
+                console.log(userdata);
+
+                /*
+                fetch("./fire_table.json").then(response => response.json()).then(json => alert(json));
+                readTextFile("./fire_table.json", function (text) {
+                    var data = JSON.parse(text);
+                    alert(data);
+                });
+                */
+
+
+                /*
+                if ((npl_or + npl_dr) > (otr_or + otr_dr)) {
+                    document.getElementById("ini_res").innerText = "Napoleonic Player Initiative";
+                    document.getElementById("status_ini").innerText = "Initiative: Napoleonic Player";
+                }
+                else if ((npl_or + npl_dr) < (otr_or + otr_dr)) {
+                    document.getElementById("odr_result").innerText = "None-Napoleonic Player Initiative";
+                    document.getElementById("status_ini").innerText = "Initiative: None-Napoleonic Player";
+                }
+                else {
+                    document.getElementById("odr_result").innerText = "No Initiative Player";
+                    document.getElementById("status_ini").innerText = "Initiative: No Player";
+                }
+                */
+            }
+            function nextTurn() {
+                current_turn++;
+                displayCurrentTurn();
+            }
+            function onLoad() {
+                displayCurrentTurn();
+            }
+            function displayCurrentTurn() {
+                document.getElementById("status_current_turn").innerText = "Current Turn: " + String(current_turn);
+                document.getElementById("status_ini").innerText = "Initiative: Not defined yet.";
+            }
+            function showHelpCheckOrders() {
+                document.getElementById("help_doc").innerText =
+                    "For No Orders unit \n" +
+                    "Artillery Fire/Limited Movement (0.5MA)/Shock(Commitment DRM +1) \n" +
+                    "For No orders unit, under orders trial, DR + OCR (when in range) <= AM Rating, if success then spend 1 order & this unit goes under orders."
+            }
+            function onShowGeneralHelp() {
+                var help = document.getElementById("gen_help");
+                var btnText = document.getElementById("show_help");
+                if (help.style.display === "none") {
+                    help.style.display = "inline";
+                    btnText.innerHTML = "Close General Help";
+                } else {
+                    help.style.display = "none";
+                    btnText.innerHTML = "Show General Help";
+                }
+            }
+            function readTextFile(file, callback) {
+                var rawFile = new XMLHttpRequest();
+                rawFile.overrideMimeType("application/json");
+                rawFile.open("GET", file, true);
+                rawFile.onreadystatechange = function () {
+                    if (rawFile.readyState === 4 && rawFile.status == "200") {
+                        callback(rawFile.responseText);
+                    }
+                }
+                rawFile.send(null);
+            }
+        </script>
+</body>
+
+</html>

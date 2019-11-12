@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Triumph & Glory / 1. Orders Phase</title>
+    <meta charset="utf-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("button").click(function () {
+                var val_odr = $("select[name=ODR]").val();
+                var val_dr = $("select[name=DR]").val();
+                if(val_dr <= val_odr) alert("success!");
+                else alert("failed!");
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <h1>Orders Phase</h1>
+    <p>
+        <p>
+            Orders Delay DR
+            <p>
+                Orders Delay Rating:
+                <select name="ODR">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </p>
+            <p>
+                Dice Roll Result:
+                <select name="DR">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                </select>
+            </p>
+            <p>
+                <button type="button" name="btn_result">Get Result</button> 
+            </p>
+        </p>
+        <p>
+            <input type="checkbox" name="check1" value="Fire">Fire!!!
+        </p>
+        <p>
+            <select name="Attack">
+                <option value="fire">Fire</option>
+                <option value="rfire">Reaction-Fire</option>
+                <option value="charge">Cavalry Charge</option>
+                <option value="hcharge">Heavy Cavalry Charge</option>
+            </select>
+        </p>
+        <!--
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script>
+        $('#t1').prop('className', 'important');
+        $('#t2').prop('class', 'current');  
+    </script>
+    -->
+</body>
+
+</html>
