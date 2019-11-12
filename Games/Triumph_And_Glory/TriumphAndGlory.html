@@ -288,8 +288,11 @@
         </div>
         <script src="jquery-3.4.1.min.js"></script>
         <script>
+            var af_table;
             $.getJSON( "fire_table.json", function( json ) {
-                console.log( "JSON Data received, name is " + json.functionality);
+                af_table = json;
+                console.log(af_table.functionality);
+                //console.log( "JSON Data received, name is " + json.functionality);
             });
 
             var odr_cumalative_drm = 0;
